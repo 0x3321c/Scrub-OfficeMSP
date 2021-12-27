@@ -1,3 +1,11 @@
+<#
+.SYNOPSIS
+This script uninstalls the MS Office MSP.
+.DESCRIPTION
+Use this script to remove silently the MS Office update patch for MSI-based installer from a computer. Run this PowerShell script for a specific KB and Microsoft Office version (from 2010 to 2016).
+#>
+
+
 $KBtargeted = "KB01234567"
 
 $Producttargeted = "_Office10.*_"
