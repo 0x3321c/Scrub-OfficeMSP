@@ -1,6 +1,10 @@
-$KBtargeted = "KB4018313"
+$KBtargeted = "KB01234567"
 
-$Producttargeted = "_Office10.PROPLUS_"
+$Producttargeted = "_Office10.*_"
+
+$installKeys = 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall', 'SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall'
+
+$officeKeys = 'SOFTWARE\Microsoft\Office','SOFTWARE\Wow6432Node\Microsoft\Office'
 
 $Numberinstalled=0
 
@@ -8,11 +12,11 @@ $KBinfo = @()
 
 Get-childitem HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall | ? { $_.Name -like "*$Producttargeted*"} | % {
 
-    $kb = Get-ItemProperty registry::$_ 
-    $displayname = $kb.DisplayName
+    $regKeys = Get-ItemProperty registry::$_ 
+    $displayname = $regKeys.DisplayName
     $uninstallstring = ''
 
-    if ($kb | select -Property UninstallString) { $uninstallstring = $kb.UninstallString }
+    if ($regKeys | select -Property UninstallString) { $uninstallstring = $regKeys.UninstallString }
     
     $tab = ''
       
@@ -44,7 +48,7 @@ $KBinfo | ? { $_.DisplayName -like "*$KBtargeted*" } | % {
 
    
   $Numberinstalled=$Numberinstalled+1  
-  $cmd =  " /package " + $_.product + " /uninstall " + $_.Patch  + " /passive /norestart /l*v " + "C:\windows\logs\PKG\" + $KBtargeted + "_" + $Numberinstalled +"-uninstall.log"
+  $cmd =  " /package " + $_.product + " /uninstall " + $_.Patch  + " /passive /norestart /l*v " + "C:\windows\temp\" + $KBtargeted + "_" + $Numberinstalled +"-uninstall.log"
   
   start-process  msiexec -ArgumentList $cmd  -Wait
    
