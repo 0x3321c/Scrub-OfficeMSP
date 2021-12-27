@@ -1,34 +1,18 @@
-<#
-.SYNOPSIS
-This script uninstalls the MS Office MSP.
-.DESCRIPTION
-Use this script to remove silently the MS Office update patch for MSI-based installer from a computer. Run this PowerShell script for a specific KB and Microsoft Office version (from 2010 to 2016).
-#>
+$KBtargeted = "KB4018313"
 
-function Remove-officeMsp{
-
-$KBtargeted = "KB01234567"
-Write-Output $KBtargeted
-
-$Producttargeted = "_Office10.*_"
-Write-Output $Producttargeted
-
-$installKeys = '\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall', '\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall'
-
-
-foreach ($intKey in $installKeys){
+$Producttargeted = "_Office10.PROPLUS_"
 
 $Numberinstalled=0
 
 $KBinfo = @()
 
-Get-childitem HKLM:$intKey | ? { $_.Name -like "*$Producttargeted*"} | % {
+Get-childitem HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall | ? { $_.Name -like "*$Producttargeted*"} | % {
 
-    $regKeys = Get-ItemProperty registry::$_ 
-    $displayname = $regKeys.DisplayName
+    $kb = Get-ItemProperty registry::$_ 
+    $displayname = $kb.DisplayName
     $uninstallstring = ''
 
-    if ($regKeys | select -Property UninstallString) { $uninstallstring = $regKeys.UninstallString }
+    if ($kb | select -Property UninstallString) { $uninstallstring = $kb.UninstallString }
     
     $tab = ''
       
@@ -60,12 +44,10 @@ $KBinfo | ? { $_.DisplayName -like "*$KBtargeted*" } | % {
 
    
   $Numberinstalled=$Numberinstalled+1  
-  $cmd =  " /package " + $_.product + " /uninstall " + $_.Patch  + " /passive /norestart /l*v " + "C:\windows\temp\" + $KBtargeted + "_" + $Numberinstalled +"-uninstall.log"
+  $cmd =  " /package " + $_.product + " /uninstall " + $_.Patch  + " /passive /norestart /l*v " + "C:\windows\logs\PKG\" + $KBtargeted + "_" + $Numberinstalled +"-uninstall.log"
   
   start-process  msiexec -ArgumentList $cmd  -Wait
    
 
 } 
 
-}
-}
