@@ -12,7 +12,7 @@ Get-childitem HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninst
     $displayname = $kb.DisplayName
     $uninstallstring = ''
 
-    if ($kb | select -Property UninstallString) { $uninstallstring = $kb.UninstallString }
+    if ($kb | Select-Object -Property UninstallString) { $uninstallstring = $kb.UninstallString }
     
     $tab = ''
       
