@@ -5,23 +5,24 @@ This script uninstalls the MS Office MSP.
 Use this script to remove silently the MS Office update patch for MSI-based installer from a computer. Run this PowerShell script for a specific KB and Microsoft Office version (from 2010 to 2016).
 #>
 
-function scrub-officeMsp{
+function Remove-officeMsp{
 
 $KBtargeted = "KB01234567"
+Write-Output $KBtargeted
 
 $Producttargeted = "_Office10.*_"
+Write-Output $Producttargeted
 
 $installKeys = '\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall', '\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall'
 
-$officeKeys = 'SOFTWARE\Microsoft\Office','SOFTWARE\Wow6432Node\Microsoft\Office'
 
-foreach (regKey in regKeys){
+foreach ($intKey in $installKeys){
 
 $Numberinstalled=0
 
 $KBinfo = @()
 
-Get-childitem HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall | ? { $_.Name -like "*$Producttargeted*"} | % {
+Get-childitem HKLM:$intKey | ? { $_.Name -like "*$Producttargeted*"} | % {
 
     $regKeys = Get-ItemProperty registry::$_ 
     $displayname = $regKeys.DisplayName
